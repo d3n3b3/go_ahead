@@ -2,9 +2,13 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_key_pair" "github_actions_key" {
-  key_name   = "github-actions"
-  public_key = file("~/.ssh/id_rsa.pub")
+data "aws_vpc" "default" {
+  default = true
+}
+
+resource "aws_key_pair" "deployer" {
+  key_name   = var.key_name
+  public_key = file(var.public_key_path)
 }
 
 resource "aws_security_group" "web_sg" {
@@ -13,6 +17,7 @@ resource "aws_security_group" "web_sg" {
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
+    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -20,6 +25,7 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
+    description = "HTTP"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -34,30 +40,14 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-data "aws_vpc" "default" {
-  default = true
-}
-
 resource "aws_instance" "web" {
-  ami                    = "ami-08c40ec9ead489470" # Ubuntu 22.04
-  instance_type          = "t2.micro"
-  key_name               = aws_key_pair.github_actions_key.key_name
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.deployer.key_name
   vpc_security_group_ids = [aws_security_group.web_sg.id]
   associate_public_ip_address = true
 
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update -y
-              apt-get install -y nginx
-              systemctl start nginx
-              systemctl enable nginx
-              EOF
-
   tags = {
-    Name = "GitHub Deployer"
+    Name = "WebServer"
   }
-}
-
-output "instance_ip" {
-  value = aws_instance.web.public_ip
 }

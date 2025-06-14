@@ -1,3 +1,5 @@
-ami_id          = "ami-020cba7c55df1f615"     # Ubuntu 22.04 LTS (us-east-1)
+aws_region      = "us-east-1"
+instance_type   = "t2.micro"
+ami_id          = "ami-020cba7c55df1f615"
 key_name        = "github-actions-key"
 public_key_path = "~/.ssh/id_rsa.pub"

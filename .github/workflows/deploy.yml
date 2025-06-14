@@ -6,17 +6,38 @@ on:
 
 jobs:
   deploy:
-    name: Copy files to EC2
+    name: Provision EC2 and Deploy HTML
     runs-on: ubuntu-latest
 
     steps:
+    # 1. Клонируем репозиторий
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Copy files using SCP
+    # 2. Устанавливаем Terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.6
+
+    # 3. Инициализируем Terraform
+    - name: Terraform Init
+      run: terraform init
+
+    # 4. Применяем конфигурацию, передаём переменные из GitHub Secrets
+    - name: Terraform Apply
+      run: terraform apply -auto-approve -var="public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+
+    # 5. Получаем IP-адрес EC2 инстанса из output Terraform
+    - name: Get EC2 public IP
+      id: ec2_ip
+      run: echo "EC2_IP=$(terraform output -raw instance_public_ip)" >> $GITHUB_ENV
+
+    # 6. Копируем index.html на EC2 через SCP
+    - name: Copy index.html to EC2
       uses: appleboy/scp-action@v0.1.4
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ env.EC2_IP }}
         username: ubuntu
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "index.html"
