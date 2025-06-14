@@ -19,11 +19,6 @@ variable "key_name" {
 }
 
 variable "public_key" {
-  description = "Public SSH key content"
+  description = "SSH public key string"
   type        = string
-}
-
-variable "public_key_path" {
-  description = "Path to the SSH public key"
-  default     = "~/.ssh/id_rsa.pub"
 }
