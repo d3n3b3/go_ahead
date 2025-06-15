@@ -53,5 +53,5 @@ jobs:
         host: ${{ env.EC2_IP }}
         username: ubuntu
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "../index.html"
+        source: "index.html"
         target: "/var/www/html"
