@@ -46,3 +46,7 @@ resource "aws_instance" "web" {
     Name = "WebServer"
   }
 }
+
+output "instance_public_ip" {
+  value = aws_instance.web.public_ip
+}
