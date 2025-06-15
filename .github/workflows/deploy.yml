@@ -39,6 +39,11 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 
+    - name: Get EC2 IP
+      id: ip
+      run: echo "EC2_IP=$(terraform output -raw ec2_ip)" >> $GITHUB_ENV
+
+
 
 
     # 5. Получаем IP-адрес EC2 инстанса из output Terraform
@@ -51,7 +56,8 @@ jobs:
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ env.EC2_IP }}
-        username: ubuntu
+        username: ec2-user
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "index.html"
-        target: "/var/www/html"
+        source: "./index.html"
+        target: "/home/ec2-user/"
+
