@@ -33,17 +33,11 @@ jobs:
      
     
     - name: Terraform Apply
-      working-directory: ./terraform
-      run: terraform apply -auto-approve -var="public_key=${{ secrets.SSH_PUBLIC_KEY }}"
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-
-
-    # 4. Применяем конфигурацию, передаём переменные из GitHub Secrets
-    - name: Terraform Apply
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: terraform apply -auto-approve -var="public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+
 
 
     # 5. Получаем IP-адрес EC2 инстанса из output Terraform
