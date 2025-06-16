@@ -42,6 +42,9 @@ jobs:
     - name: Get EC2 public IP
       id: ec2_ip
       run: echo "EC2_IP=$(terraform output -raw instance_public_ip)" >> $GITHUB_ENV
+     
+    - name: Wait for EC2 to be ready
+      run: sleep 60
 
 
     # 6. Копируем index.html на EC2 через SCP
@@ -49,8 +52,8 @@ jobs:
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ env.EC2_IP }}
-        username: ec2-user
+        username: ubuntu
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "./index.html"
-        target: "/home/ec2-user/"
+        target: "/home/ubuntu/"
 
